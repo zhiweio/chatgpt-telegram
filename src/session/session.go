@@ -4,6 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -67,6 +71,42 @@ func GetSession() (string, error) {
 	}
 	if err := pw.Stop(); err != nil {
 		return "", errors.New(fmt.Sprintf("Couldn't stop headless browser: %v", err))
+	}
+
+	return sessionToken, nil
+}
+
+func GetSessionByRevChatGPT() (string, error) {
+	email := os.Getenv("CHATGPT_EMAIL")
+	password := os.Getenv("CHATGPT_PASSWORD")
+
+	if email == "" || password == "" {
+		return "", errors.New(fmt.Sprintf("Empty email or password"))
+	}
+
+	exePath, err := os.Executable()
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Couldn't get file location: %v", err))
+	}
+
+	scriptPath := filepath.Join(filepath.Dir(exePath), "generate_session.py")
+	args := []string{email, password}
+	_, err = os.Stat(scriptPath)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Script '%s' not found, %v", scriptPath, err))
+	}
+
+	cmd := exec.Command("python", append([]string{scriptPath}, args...)...)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Couldn't execute commad: %s, %v", cmd, err))
+	}
+
+	var sessionToken string
+	sessionToken = strings.TrimSpace(string(output))
+
+	if sessionToken == "" {
+		return "", errors.New(fmt.Sprintf("Couldn't get session token"))
 	}
 
 	return sessionToken, nil

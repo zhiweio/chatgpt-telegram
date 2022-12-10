@@ -13,6 +13,8 @@ Download the file corresponding to your OS in the [releases page](https://github
 - `chatgpt-telegram-Win-amd64`: Windows
 
 After you download the file, extract it into a folder and open the `env.example` file with a text editor and fill in your credentials. 
+- `CHATGPT_EMAIL`: Your OpenAPI account email
+- `CHATGPT_PASSWORD`: Your OpenAPI account password
 - `TELEGRAM_TOKEN`: Your Telegram Bot token
   - Follow [this guide](https://core.telegram.org/bots/tutorial#obtain-your-bot-token) to create a bot and get the token.
 - `TELEGRAM_ID` (Optional): Your Telegram User ID
@@ -23,9 +25,13 @@ After you download the file, extract it into a folder and open the `env.example`
 - Save the file, and rename it to `.env`.
 > **Note** Make sure you rename the file to _exactly_ `.env`! The program won't work otherwise.
 
+Then ensure python script `generate_session.py` exists in the same folder with binary file `chatgpt-telegram`, run `pip3 install revChatGPT --upgrade` to install python dependencies.
+
 Finally, open the terminal in your computer (if you're on windows, look for `PowerShell`), navigate to the path you extracted the above file (you can use `cd dirname` to navigate to a directory, ask ChatGPT if you need more assistance 😉) and run `./chatgpt-telegram`.
 
-## Authentication
+## Authentication (Optional)
+
+> Now can obtain openapi session automatically.
 
 By default, the program will launch a browser for you to sign into your account, and close it once you're signed in. If this setup doesn't work for you (there are issues with the browser starting, you want to run this in a computer with no screen, etc.), you can manually extract your session from your browser instead.
 

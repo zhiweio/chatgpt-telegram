@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/m1guelpf/chatgpt-telegram/src/session"
 	"log"
 	"net/http"
 	"time"
@@ -123,9 +124,16 @@ func (c *ChatGPT) SendMessage(message string, tgChatID int64) (chan ChatResponse
 }
 
 func (c *ChatGPT) refreshAccessToken() (string, error) {
+	log.Println("Refresh access token...")
 	cachedAccessToken, ok := c.AccessTokenMap.Get(KEY_ACCESS_TOKEN)
 	if ok {
 		return cachedAccessToken, nil
+	}
+
+	log.Println("Refresh session token...")
+	err := c.refreshSessionToken()
+	if err != nil {
+		return "", fmt.Errorf("failed to refesh session token: %v", err)
 	}
 
 	req, err := http.NewRequest("GET", "https://chat.openai.com/api/auth/session", nil)
@@ -168,4 +176,25 @@ func (c *ChatGPT) refreshAccessToken() (string, error) {
 	c.AccessTokenMap.Set(KEY_ACCESS_TOKEN, accessToken, expiryTime.Sub(time.Now()))
 
 	return accessToken, nil
+}
+
+func (c *ChatGPT) refreshSessionToken() error {
+	sessionToken, err := session.GetSessionByRevChatGPT()
+	if err != nil {
+		return errors.New(fmt.Sprintf("Couldn't refresh session token"))
+	}
+
+	c.SessionToken = sessionToken
+
+	cfg, err := config.Init()
+	if err != nil {
+		return errors.New(fmt.Sprintf("Couldn't load config: %v", err))
+	}
+
+	err = cfg.Set("OpenAISession", sessionToken)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Couldn't save OpenAI session: %v", err))
+	}
+
+	return err
 }

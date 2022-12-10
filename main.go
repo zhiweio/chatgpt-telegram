@@ -17,13 +17,18 @@ import (
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Couldn't load .env file: %v", err)
+	}
+
 	config, err := config.Init()
 	if err != nil {
 		log.Fatalf("Couldn't load config: %v", err)
 	}
 
 	if config.OpenAISession == "" {
-		session, err := session.GetSession()
+		session, err := session.GetSessionByRevChatGPT()
 		if err != nil {
 			log.Fatalf("Couldn't get OpenAI session: %v", err)
 		}
@@ -36,11 +41,6 @@ func main() {
 
 	chatGPT := chatgpt.Init(config)
 	log.Println("Started ChatGPT")
-
-	err = godotenv.Load()
-	if err != nil {
-		log.Fatalf("Couldn't load .env file: %v", err)
-	}
 
 	editInterval := 1 * time.Second
 	if os.Getenv("EDIT_WAIT_SECONDS") != "" {

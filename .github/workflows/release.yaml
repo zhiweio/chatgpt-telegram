@@ -32,7 +32,7 @@ jobs:
       - uses: wangyoucao577/go-release-action@v1.34
         with:
           md5sum: false
-          extra_files: README.md LICENSE env.example
+          extra_files: README.md LICENSE env.example generate_session.py
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
