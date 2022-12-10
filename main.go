@@ -28,15 +28,25 @@ func main() {
 	}
 
 	if config.OpenAISession == "" {
-		session, err := session.GetSessionByRevChatGPT()
+		var sessionToken string
+
+		if os.Getenv("CHATGPT_EMAIL") != "" {
+			log.Println("Request session token by revChatGPT...")
+			sessionToken, err = session.GetSessionByRevChatGPT()
+		} else {
+			log.Println("Request session token by playwright...")
+			sessionToken, err = session.GetSession()
+		}
 		if err != nil {
 			log.Fatalf("Couldn't get OpenAI session: %v", err)
 		}
 
-		err = config.Set("OpenAISession", session)
+		err = config.Set("OpenAISession", sessionToken)
 		if err != nil {
 			log.Fatalf("Couldn't save OpenAI session: %v", err)
 		}
+	} else {
+		log.Println("Loaded session token from config file.")
 	}
 
 	chatGPT := chatgpt.Init(config)
