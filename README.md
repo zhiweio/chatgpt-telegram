@@ -29,6 +29,33 @@ Then ensure python script `generate_session.py` exists in the same folder with b
 
 Finally, open the terminal in your computer (if you're on windows, look for `PowerShell`), navigate to the path you extracted the above file (you can use `cd dirname` to navigate to a directory, ask ChatGPT if you need more assistance 😉) and run `./chatgpt-telegram`.
 
+### Running with Docker
+
+If you're trying to run this on a server with an existing Docker setup, you might want to use our Docker image instead.
+
+```sh
+docker pull ghcr.io/m1guelpf/chatgpt-telegram
+```
+
+Here's how you'd set things up with `docker-compose`:
+
+```yaml
+services:
+  chatgpt-telegram:
+    image: ghcr.io/m1guelpf/chatgpt-telegram
+    container_name: chatgpt-telegram
+    volumes:
+      # your ".config" local folder must include a "chatgpt.json" file
+      - .config/:/root/.config
+    environment:
+      - CHATGPT_EMAIL=
+      - CHATGPT_PASSWORD=
+      - TELEGRAM_ID=
+      - TELEGRAM_TOKEN=
+```
+
+> **Note** The docker setup only support the `revChatGPT` authentication mechanism.
+
 ## Authentication (Optional)
 
 > Now can obtain openapi session automatically.
